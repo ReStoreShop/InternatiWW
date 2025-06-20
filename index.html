@@ -1,0 +1,1538 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Archivio Storico Internati - Seconda Guerra Mondiale</title>
+    <meta name="description" content="Database storico dedicato alla memoria degli internati della Seconda Guerra Mondiale. Archivio documentale per preservare la storia.">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Times New Roman', serif;
+            background: linear-gradient(135deg, #2c2c2c 0%, #1a1a1a 100%);
+            background-image: 
+                radial-gradient(circle at 20% 80%, rgba(120, 120, 120, 0.1) 0%, transparent 50%),
+                radial-gradient(circle at 80% 20%, rgba(120, 120, 120, 0.1) 0%, transparent 50%);
+            min-height: 100vh;
+            padding: 20px;
+            color: #333;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            background: #f8f6f0;
+            border: 3px solid #8b4513;
+            box-shadow: 
+                0 0 30px rgba(0,0,0,0.7),
+                inset 0 0 20px rgba(139, 69, 19, 0.1);
+            overflow: hidden;
+        }
+
+        .header {
+            background: linear-gradient(135deg, #5d4037 0%, #3e2723 100%);
+            background-image: 
+                url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><circle cx="50" cy="50" r="2" fill="rgba(255,255,255,0.1)"/></svg>'),
+                linear-gradient(45deg, transparent 40%, rgba(255,255,255,0.05) 50%, transparent 60%);
+            color: #f5f5dc;
+            padding: 40px 30px;
+            text-align: center;
+            border-bottom: 4px solid #8b4513;
+            position: relative;
+        }
+
+        .header::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: 
+                repeating-linear-gradient(
+                    45deg,
+                    transparent,
+                    transparent 2px,
+                    rgba(139, 69, 19, 0.1) 2px,
+                    rgba(139, 69, 19, 0.1) 4px
+                );
+            pointer-events: none;
+        }
+
+        .header h1 {
+            font-size: 2.8em;
+            margin-bottom: 15px;
+            font-weight: 700;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.5);
+            letter-spacing: 2px;
+            position: relative;
+            z-index: 1;
+        }
+
+        .header h1::before {
+            content: '🕊️';
+            margin-right: 15px;
+        }
+
+        .header h1::after {
+            content: '🕊️';
+            margin-left: 15px;
+        }
+
+        .header p {
+            font-size: 1.2em;
+            opacity: 0.95;
+            font-style: italic;
+            position: relative;
+            z-index: 1;
+            margin-top: 10px;
+        }
+
+        .nav-tabs {
+            display: flex;
+            background: linear-gradient(135deg, #8d6e63 0%, #5d4037 100%);
+            border-bottom: 3px solid #3e2723;
+            box-shadow: inset 0 -2px 4px rgba(0,0,0,0.2);
+        }
+
+        .nav-tab {
+            padding: 18px 28px;
+            background: none;
+            border: none;
+            cursor: pointer;
+            font-size: 1.1em;
+            font-weight: 600;
+            color: #f5f5dc;
+            transition: all 0.3s ease;
+            border-bottom: 4px solid transparent;
+            font-family: 'Times New Roman', serif;
+            text-shadow: 1px 1px 2px rgba(0,0,0,0.3);
+        }
+
+        .nav-tab.active {
+            background: linear-gradient(135deg, #f5f5dc 0%, #f0ead6 100%);
+            border-bottom-color: #8b4513;
+            color: #3e2723;
+            text-shadow: none;
+            box-shadow: inset 0 2px 4px rgba(139, 69, 19, 0.2);
+        }
+
+        .nav-tab:hover {
+            background: rgba(245, 245, 220, 0.1);
+            transform: translateY(-1px);
+        }
+
+        .tab-content {
+            padding: 35px;
+            background: #f8f6f0;
+        }
+
+        .tab-pane {
+            display: none;
+        }
+
+        .tab-pane.active {
+            display: block;
+        }
+
+        /* Ricerca */
+        .search-section {
+            background: linear-gradient(135deg, #efebe9 0%, #d7ccc8 100%);
+            padding: 30px;
+            border: 2px solid #8d6e63;
+            border-radius: 0;
+            margin-bottom: 30px;
+            box-shadow: 
+                inset 0 2px 4px rgba(0,0,0,0.1),
+                0 4px 8px rgba(0,0,0,0.1);
+            position: relative;
+        }
+
+        .search-section::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: repeating-linear-gradient(
+                90deg,
+                #8b4513 0px,
+                #8b4513 10px,
+                #5d4037 10px,
+                #5d4037 20px
+            );
+        }
+
+        .search-section h2 {
+            color: #3e2723;
+            text-shadow: 1px 1px 2px rgba(0,0,0,0.1);
+            border-bottom: 2px solid #8d6e63;
+            padding-bottom: 10px;
+            margin-bottom: 25px;
+        }
+
+        .search-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+
+        .form-group {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .form-group label {
+            font-weight: 700;
+            margin-bottom: 8px;
+            color: #3e2723;
+            font-family: 'Times New Roman', serif;
+            font-size: 1.05em;
+        }
+
+        .form-group input, .form-group select {
+            padding: 14px;
+            border: 2px solid #8d6e63;
+            border-radius: 0;
+            font-size: 1em;
+            transition: all 0.3s ease;
+            background: #fafafa;
+            font-family: 'Times New Roman', serif;
+        }
+
+        .form-group input:focus, .form-group select:focus {
+            outline: none;
+            border-color: #5d4037;
+            background: white;
+            box-shadow: 0 0 8px rgba(93, 64, 55, 0.3);
+        }
+
+        .search-buttons {
+            display: flex;
+            gap: 10px;
+            justify-content: center;
+        }
+
+        .btn {
+            padding: 14px 28px;
+            border: 2px solid transparent;
+            border-radius: 0;
+            cursor: pointer;
+            font-size: 1.05em;
+            font-weight: 700;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            display: inline-block;
+            text-align: center;
+            font-family: 'Times New Roman', serif;
+            text-shadow: 1px 1px 2px rgba(0,0,0,0.2);
+            letter-spacing: 0.5px;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #8d6e63 0%, #5d4037 100%);
+            color: #f5f5dc;
+            border-color: #3e2723;
+        }
+
+        .btn-primary:hover {
+            background: linear-gradient(135deg, #5d4037 0%, #3e2723 100%);
+            transform: translateY(-2px);
+            box-shadow: 0 6px 16px rgba(93, 64, 55, 0.4);
+        }
+
+        .btn-secondary {
+            background: linear-gradient(135deg, #6d4c41 0%, #4e342e 100%);
+            color: #f5f5dc;
+            border-color: #3e2723;
+        }
+
+        .btn-success {
+            background: linear-gradient(135deg, #689f38 0%, #558b2f 100%);
+            color: white;
+            border-color: #33691e;
+        }
+
+        .btn-danger {
+            background: linear-gradient(135deg, #d32f2f 0%, #b71c1c 100%);
+            color: white;
+            font-size: 0.95em;
+            padding: 10px 16px;
+            border-color: #8e0000;
+        }
+
+        /* Risultati */
+        .results-section {
+            margin-top: 35px;
+        }
+
+        .result-card {
+            background: linear-gradient(135deg, #ffffff 0%, #f5f5f5 100%);
+            border: 2px solid #8d6e63;
+            border-radius: 0;
+            padding: 25px;
+            margin-bottom: 20px;
+            transition: all 0.3s ease;
+            box-shadow: 
+                0 4px 12px rgba(0,0,0,0.15),
+                inset 0 1px 0 rgba(255,255,255,0.2);
+            position: relative;
+        }
+
+        .result-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 6px;
+            height: 100%;
+            background: linear-gradient(180deg, #8b4513 0%, #5d4037 100%);
+        }
+
+        .result-card:hover {
+            box-shadow: 
+                0 8px 24px rgba(0,0,0,0.25),
+                inset 0 1px 0 rgba(255,255,255,0.2);
+            transform: translateY(-3px);
+            border-color: #5d4037;
+        }
+
+        .result-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+
+        .result-name {
+            font-size: 1.4em;
+            font-weight: 700;
+            color: #3e2723;
+            margin-bottom: 8px;
+            font-family: 'Times New Roman', serif;
+            text-shadow: 1px 1px 2px rgba(0,0,0,0.1);
+        }
+
+        .result-details {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 10px;
+            margin-bottom: 15px;
+        }
+
+        .detail-item {
+            padding: 12px 16px;
+            background: linear-gradient(135deg, #f5f5f5 0%, #eeeeee 100%);
+            border-left: 4px solid #8d6e63;
+            font-size: 0.95em;
+            margin-bottom: 5px;
+        }
+
+        .detail-label {
+            font-weight: 700;
+            color: #3e2723;
+            font-family: 'Times New Roman', serif;
+        }
+
+        /* Form inserimento */
+        .form-section {
+            background: linear-gradient(135deg, #efebe9 0%, #d7ccc8 100%);
+            padding: 30px;
+            border: 2px solid #8d6e63;
+            border-radius: 0;
+            margin-bottom: 25px;
+            box-shadow: 
+                inset 0 2px 4px rgba(0,0,0,0.1),
+                0 4px 8px rgba(0,0,0,0.1);
+        }
+
+        .form-section h2, .form-section h3 {
+            color: #3e2723;
+            border-bottom: 2px solid #8d6e63;
+            padding-bottom: 10px;
+            margin-bottom: 25px;
+            font-family: 'Times New Roman', serif;
+        }
+
+        .form-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 20px;
+        }
+
+        .form-group textarea {
+            padding: 14px;
+            border: 2px solid #8d6e63;
+            border-radius: 0;
+            font-size: 1em;
+            min-height: 120px;
+            resize: vertical;
+            font-family: 'Times New Roman', serif;
+            background: #fafafa;
+        }
+
+        .form-group textarea:focus {
+            outline: none;
+            border-color: #5d4037;
+            background: white;
+            box-shadow: 0 0 8px rgba(93, 64, 55, 0.3);
+        }
+
+        /* Statistiche */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 25px;
+            margin-bottom: 35px;
+        }
+
+        .stat-card {
+            background: linear-gradient(135deg, #ffffff 0%, #f8f6f0 100%);
+            padding: 30px;
+            border: 2px solid #8d6e63;
+            border-radius: 0;
+            text-align: center;
+            box-shadow: 
+                0 6px 18px rgba(0,0,0,0.15),
+                inset 0 1px 0 rgba(255,255,255,0.2);
+            border-left: 6px solid #8b4513;
+            position: relative;
+        }
+
+        .stat-card::before {
+            content: '';
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            width: 20px;
+            height: 20px;
+            background: radial-gradient(circle, #8b4513 30%, transparent 30%);
+            opacity: 0.3;
+        }
+
+        .stat-number {
+            font-size: 2.8em;
+            font-weight: 900;
+            color: #5d4037;
+            margin-bottom: 12px;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.1);
+            font-family: 'Times New Roman', serif;
+        }
+
+        .stat-label {
+            font-size: 1.15em;
+            color: #3e2723;
+            font-weight: 700;
+            font-family: 'Times New Roman', serif;
+        }
+
+        .no-results {
+            text-align: center;
+            padding: 50px;
+            color: #5d4037;
+            font-size: 1.2em;
+            background: linear-gradient(135deg, #f5f5f5 0%, #eeeeee 100%);
+            border: 2px solid #8d6e63;
+            font-family: 'Times New Roman', serif;
+        }
+
+        .no-results h3 {
+            margin-bottom: 15px;
+            color: #3e2723;
+        }
+
+        .highlight {
+            background: linear-gradient(135deg, #fff3cd 0%, #ffeaa7 100%);
+            padding: 3px 6px;
+            border-radius: 0;
+            border: 1px solid #d4a574;
+            font-weight: 600;
+        }
+
+        /* Sezione immagini */
+        .image-upload-section {
+            margin-top: 10px;
+        }
+
+        .image-preview-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+            gap: 15px;
+            margin-top: 20px;
+            padding: 15px;
+            border: 2px dashed #8d6e63;
+            background: #fafafa;
+            min-height: 60px;
+        }
+
+        .image-preview {
+            position: relative;
+            border: 2px solid #8d6e63;
+            border-radius: 0;
+            overflow: hidden;
+            background: white;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+            transition: all 0.3s ease;
+        }
+
+        .image-preview:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 16px rgba(0,0,0,0.2);
+        }
+
+        .image-preview img {
+            width: 100%;
+            height: 120px;
+            object-fit: cover;
+            display: block;
+        }
+
+        .image-preview .image-info {
+            padding: 8px;
+            background: #f5f5f5;
+            font-size: 0.8em;
+            color: #5d4037;
+            border-top: 1px solid #8d6e63;
+        }
+
+        .image-preview .image-actions {
+            position: absolute;
+            top: 5px;
+            right: 5px;
+            display: flex;
+            gap: 5px;
+        }
+
+        .image-preview .btn-small {
+            padding: 4px 8px;
+            font-size: 0.7em;
+            min-width: auto;
+            background: rgba(0,0,0,0.7);
+            color: white;
+            border: none;
+            cursor: pointer;
+        }
+
+        .image-preview .btn-small:hover {
+            background: rgba(0,0,0,0.9);
+        }
+
+        .image-gallery {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+            gap: 15px;
+            margin-top: 15px;
+            padding: 15px;
+            background: #f8f6f0;
+            border: 2px solid #8d6e63;
+        }
+
+        .gallery-image {
+            position: relative;
+            border: 2px solid #8d6e63;
+            overflow: hidden;
+            background: white;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .gallery-image:hover {
+            transform: scale(1.02);
+            box-shadow: 0 8px 20px rgba(0,0,0,0.3);
+        }
+
+        .gallery-image img {
+            width: 100%;
+            height: 150px;
+            object-fit: cover;
+            display: block;
+        }
+
+        .gallery-image .image-caption {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background: linear-gradient(transparent, rgba(0,0,0,0.8));
+            color: white;
+            padding: 15px 10px 8px;
+            font-size: 0.85em;
+            text-shadow: 1px 1px 2px rgba(0,0,0,0.8);
+        }
+
+        /* Modal per visualizzazione immagini */
+        .image-modal {
+            display: none;
+            position: fixed;
+            z-index: 1000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.9);
+            backdrop-filter: blur(5px);
+        }
+
+        .image-modal.active {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .modal-content {
+            position: relative;
+            max-width: 90%;
+            max-height: 90%;
+            background: white;
+            border: 4px solid #8d6e63;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.5);
+        }
+
+        .modal-content img {
+            width: 100%;
+            height: auto;
+            display: block;
+        }
+
+        .modal-close {
+            position: absolute;
+            top: -40px;
+            right: 0;
+            background: #d32f2f;
+            color: white;
+            border: none;
+            padding: 10px 15px;
+            cursor: pointer;
+            font-size: 1.2em;
+            font-weight: bold;
+        }
+
+        .modal-info {
+            position: absolute;
+            bottom: -60px;
+            left: 0;
+            right: 0;
+            background: rgba(0,0,0,0.8);
+            color: white;
+            padding: 15px;
+            font-family: 'Times New Roman', serif;
+        }
+
+        @media (max-width: 768px) {
+            .search-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .form-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .nav-tabs {
+                flex-wrap: wrap;
+            }
+            
+            .header h1 {
+                font-size: 2em;
+            }
+
+            .nav-tab {
+                padding: 12px 16px;
+                font-size: 1em;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>Archivio Storico Internati</h1>
+            <p>Memoria e Documentazione della Seconda Guerra Mondiale • 1939-1945</p>
+            <div style="margin-top: 20px; font-size: 0.9em; opacity: 0.8;">
+                "Perché la memoria non si perda mai"
+            </div>
+        </div>
+
+        <div class="nav-tabs">
+            <button class="nav-tab active" onclick="switchTab('ricerca')">🔍 Ricerca Archivi</button>
+            <button class="nav-tab" onclick="switchTab('inserimento')">📝 Nuovo Documento</button>
+            <button class="nav-tab" onclick="switchTab('statistiche')">📊 Statistiche Storiche</button>
+            <button class="nav-tab" onclick="switchTab('gestione')">⚙️ Gestione Archivio</button>
+        </div>
+
+        <!-- TAB RICERCA -->
+        <div id="ricerca" class="tab-pane active">
+            <div class="tab-content">
+                <div class="search-section">
+                    <h2 style="margin-bottom: 25px; color: #3e2723;">🔍 Ricerca negli Archivi Storici</h2>
+                    <div style="margin-bottom: 20px; padding: 15px; background: rgba(139, 69, 19, 0.1); border-left: 4px solid #8b4513; font-style: italic; color: #5d4037;">
+                        <strong>Archivio Documentale:</strong> Questo database raccoglie testimonianze e documenti storici per preservare la memoria degli internati della Seconda Guerra Mondiale
+                    </div>
+                    <div class="search-grid">
+                        <div class="form-group">
+                            <label for="searchName">Nome/Cognome</label>
+                            <input type="text" id="searchName" placeholder="Inserisci nome o cognome">
+                        </div>
+                        <div class="form-group">
+                            <label for="searchCamp">Campo di Internamento</label>
+                            <input type="text" id="searchCamp" placeholder="Nome del campo">
+                        </div>
+                        <div class="form-group">
+                            <label for="searchLocation">Località</label>
+                            <input type="text" id="searchLocation" placeholder="Città o regione">
+                        </div>
+                        <div class="form-group">
+                            <label for="searchYear">Anno</label>
+                            <input type="number" id="searchYear" placeholder="Anno (es. 1943)" min="1939" max="1945">
+                        </div>
+                        <div class="form-group">
+                            <label for="searchNationality">Nazionalità</label>
+                            <select id="searchNationality">
+                                <option value="">Tutte le nazionalità</option>
+                                <option value="italiana">Italiana</option>
+                                <option value="tedesca">Tedesca</option>
+                                <option value="austriaca">Austriaca</option>
+                                <option value="francese">Francese</option>
+                                <option value="polacca">Polacca</option>
+                                <option value="jugoslava">Jugoslava</option>
+                                <option value="greca">Greca</option>
+                                <option value="altra">Altra</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label for="searchStatus">Status</label>
+                            <select id="searchStatus">
+                                <option value="">Tutti gli status</option>
+                                <option value="internato_militare">Internato Militare</option>
+                                <option value="internato_civile">Internato Civile</option>
+                                <option value="prigioniero_guerra">Prigioniero di Guerra</option>
+                                <option value="deportato">Deportato</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="search-buttons">
+                        <button class="btn btn-primary" onclick="performSearch()">🔍 Cerca</button>
+                        <button class="btn btn-secondary" onclick="clearSearch()">🗑️ Pulisci</button>
+                    </div>
+                </div>
+
+                <div class="results-section">
+                    <div id="searchResults"></div>
+                </div>
+            </div>
+        </div>
+
+        <!-- TAB INSERIMENTO -->
+        <div id="inserimento" class="tab-pane">
+            <div class="tab-content">
+                <div class="form-section">
+                    <h2 style="margin-bottom: 20px; color: #3e2723;">📝 Inserimento Nuovo Internato</h2>
+                    <form id="insertForm">
+                        <div class="form-grid">
+                            <div class="form-group">
+                                <label for="campo">Campo di Internamento *</label>
+                                <input type="text" id="campo" required>
+                            </div>
+                            <div class="form-group">
+                                <label for="localitaCampo">Località Campo</label>
+                                <input type="text" id="localitaCampo">
+                            </div>
+                            <div class="form-group">
+                                <label for="dataInternamento">Data Internamento</label>
+                                <input type="date" id="dataInternamento">
+                            </div>
+                            <div class="form-group">
+                                <label for="dataLiberazione">Data Liberazione</label>
+                                <input type="date" id="dataLiberazione">
+                            </div>
+                            <div class="form-group">
+                                <label for="numeroMatricola">Numero Matricola</label>
+                                <input type="text" id="numeroMatricola">
+                            </div>
+                            <div class="form-group">
+                                <label for="unitaMilitare">Unità Militare</label>
+                                <input type="text" id="unitaMilitare">
+                            </div>
+                        </div>
+                        <div class="form-group" style="margin-top: 20px;">
+                            <label for="note">Note e Informazioni Aggiuntive</label>
+                            <textarea id="note" rows="4" placeholder="Inserisci eventuali note, documenti correlati, testimonianze..."></textarea>
+                        </div>
+                        <div class="form-group" style="margin-top: 20px;">
+                            <label for="documenti">Documenti Correlati</label>
+                            <textarea id="documenti" rows="3" placeholder="Lista dei documenti disponibili (foto, lettere, certificati...)"></textarea>
+                        </div>
+                        <div class="form-group" style="margin-top: 20px;">
+                            <label for="immagini">📷 Immagini e Documenti Fotografici</label>
+                            <div class="image-upload-section">
+                                <input type="file" id="imageUpload" multiple accept="image/*" style="display: none;" onchange="handleImageUpload(event)">
+                                <button type="button" class="btn btn-secondary" onclick="document.getElementById('imageUpload').click()">
+                                    📁 Carica Immagini
+                                </button>
+                                <div class="image-preview-container" id="imagePreviewContainer">
+                                    <!-- Le anteprime delle immagini appariranno qui -->
+                                </div>
+                            </div>
+                        </div>
+                        <div style="text-align: center; margin-top: 30px;">
+                            <button type="submit" class="btn btn-success">💾 Salva Internato</button>
+                            <button type="button" class="btn btn-secondary" onclick="clearForm()">🗑️ Pulisci Form</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+        <!-- TAB STATISTICHE -->
+        <div id="statistiche" class="tab-pane">
+            <div class="tab-content">
+                <h2 style="margin-bottom: 30px; color: #3e2723;">📊 Statistiche Database</h2>
+                <div class="stats-grid" id="statsContainer">
+                    <!-- Le statistiche verranno generate dinamicamente -->
+                </div>
+                <div id="chartsContainer">
+                    <!-- Qui verranno mostrati i grafici -->
+                </div>
+            </div>
+        </div>
+
+        <!-- TAB GESTIONE -->
+        <div id="gestione" class="tab-pane">
+            <div class="tab-content">
+                <h2 style="margin-bottom: 30px; color: #3e2723;">⚙️ Gestione Database</h2>
+                
+                <div class="form-section">
+                    <h3 style="margin-bottom: 15px;">Importa/Esporta Dati</h3>
+                    <div style="display: flex; gap: 15px; flex-wrap: wrap;">
+                        <button class="btn btn-primary" onclick="exportData()">📥 Esporta Dati (JSON)</button>
+                        <button class="btn btn-primary" onclick="exportCSV()">📊 Esporta CSV</button>
+                        <div>
+                            <input type="file" id="importFile" accept=".json,.csv" style="display: none;" onchange="importData()">
+                            <button class="btn btn-secondary" onclick="document.getElementById('importFile').click()">📤 Importa Dati</button>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="form-section">
+                    <h3 style="margin-bottom: 15px;">Gestione Record</h3>
+                    <div id="managementList">
+                        <!-- Lista dei record per gestione -->
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal per visualizzazione immagini -->
+    <div id="imageModal" class="image-modal">
+        <div class="modal-content">
+            <button class="modal-close" onclick="closeImageModal()">✕</button>
+            <img id="modalImage" src="" alt="">
+            <div class="modal-info">
+                <div id="modalImageInfo"></div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Database principale (in memoria)
+        let internatiDB = [];
+        let editingId = null;
+        let currentImages = [];
+
+        // Inizializza il database con alcuni dati di esempio
+        function initializeDatabase() {
+            const sampleData = [
+                {
+                    id: 1,
+                    nome: "Giuseppe",
+                    cognome: "Rossi",
+                    dataNascita: "1920-03-15",
+                    luogoNascita: "Roma",
+                    nazionalita: "italiana",
+                    status: "internato_militare",
+                    campo: "Stalag IV-B",
+                    localitaCampo: "Mühlberg, Germania",
+                    dataInternamento: "1943-09-08",
+                    dataLiberazione: "1945-04-23",
+                    numeroMatricola: "78432",
+                    unitaMilitare: "4° Reggimento Alpini",
+                    note: "Catturato dopo l'armistizio dell'8 settembre 1943",
+                    documenti: "Foto tessera, lettera alla famiglia del 1944",
+                    immagini: []
+                },
+                {
+                    id: 2,
+                    nome: "Maria",
+                    cognome: "Bianchi",
+                    dataNascita: "1922-07-22",
+                    luogoNascita: "Trieste",
+                    nazionalita: "italiana",
+                    status: "internato_civile",
+                    campo: "Risiera di San Sabba",
+                    localitaCampo: "Trieste",
+                    dataInternamento: "1944-01-12",
+                    dataLiberazione: "1945-05-01",
+                    numeroMatricola: "C-2847",
+                    unitaMilitare: "",
+                    note: "Internata per attività partigiana",
+                    documenti: "Testimonianza orale, certificato di deportazione",
+                    immagini: []
+                },
+                {
+                    id: 3,
+                    nome: "Johann",
+                    cognome: "Weber",
+                    dataNascita: "1918-11-03",
+                    luogoNascita: "Vienna",
+                    nazionalita: "austriaca",
+                    status: "prigioniero_guerra",
+                    campo: "Campo PG 73",
+                    localitaCampo: "Carpi, Italia",
+                    dataInternamento: "1943-05-20",
+                    dataLiberazione: "1946-02-15",
+                    numeroMatricola: "PG-9847",
+                    unitaMilitare: "Wehrmacht 5th Division",
+                    note: "Prigioniero di guerra catturato in Tunisia",
+                    documenti: "Scheda personale, corrispondenza",
+                    immagini: []
+                }
+            ];
+
+            if (internatiDB.length === 0) {
+                internatiDB = sampleData;
+                loadFromStorage();
+                updateStatistics();
+            }
+        }
+
+        // Salvataggio e caricamento da localStorage
+        function saveToStorage() {
+            try {
+                localStorage.setItem('internatiDB', JSON.stringify(internatiDB));
+                console.log('Dati salvati:', internatiDB.length, 'record');
+            } catch (error) {
+                console.error('Errore nel salvataggio:', error);
+                alert('Errore nel salvataggio dei dati. Potresti aver superato il limite di memoria del browser.');
+            }
+        }
+
+        function loadFromStorage() {
+            try {
+                const saved = localStorage.getItem('internatiDB');
+                if (saved) {
+                    internatiDB = JSON.parse(saved);
+                    console.log('Dati caricati:', internatiDB.length, 'record');
+                }
+            } catch (error) {
+                console.error('Errore nel caricamento:', error);
+            }
+        }
+
+        // Gestione tabs
+        function switchTab(tabName) {
+            // Rimuovi active da tutti i tab
+            document.querySelectorAll('.nav-tab').forEach(tab => tab.classList.remove('active'));
+            document.querySelectorAll('.tab-pane').forEach(pane => pane.classList.remove('active'));
+            
+            // Attiva il tab selezionato
+            event.target.classList.add('active');
+            document.getElementById(tabName).classList.add('active');
+            
+            // Aggiorna contenuto specifico del tab
+            if (tabName === 'statistiche') {
+                updateStatistics();
+            } else if (tabName === 'gestione') {
+                loadManagementList();
+            }
+        }
+
+        // Funzioni di ricerca
+        function performSearch() {
+            const searchTerms = {
+                name: document.getElementById('searchName').value.toLowerCase(),
+                camp: document.getElementById('searchCamp').value.toLowerCase(),
+                location: document.getElementById('searchLocation').value.toLowerCase(),
+                year: document.getElementById('searchYear').value,
+                nationality: document.getElementById('searchNationality').value,
+                status: document.getElementById('searchStatus').value
+            };
+
+            const results = internatiDB.filter(person => {
+                return (
+                    (!searchTerms.name || 
+                     person.nome.toLowerCase().includes(searchTerms.name) || 
+                     person.cognome.toLowerCase().includes(searchTerms.name)) &&
+                    (!searchTerms.camp || 
+                     person.campo.toLowerCase().includes(searchTerms.camp)) &&
+                    (!searchTerms.location || 
+                     person.localitaCampo.toLowerCase().includes(searchTerms.location)) &&
+                    (!searchTerms.year || 
+                     person.dataInternamento.includes(searchTerms.year) ||
+                     person.dataLiberazione.includes(searchTerms.year)) &&
+                    (!searchTerms.nationality || 
+                     person.nazionalita === searchTerms.nationality) &&
+                    (!searchTerms.status || 
+                     person.status === searchTerms.status)
+                );
+            });
+
+            displaySearchResults(results, searchTerms);
+        }
+
+        function displaySearchResults(results, searchTerms) {
+            const resultsContainer = document.getElementById('searchResults');
+            
+            if (results.length === 0) {
+                resultsContainer.innerHTML = `
+                    <div class="no-results">
+                        <h3>Nessun risultato trovato</h3>
+                        <p>Prova a modificare i criteri di ricerca</p>
+                    </div>
+                `;
+                return;
+            }
+
+            let html = `<h3 style="margin-bottom: 20px; color: #3e2723;">Trovati ${results.length} risultati</h3>`;
+            
+            results.forEach(person => {
+                const highlightedName = highlightSearchTerm(
+                    `${person.nome} ${person.cognome}`, 
+                    searchTerms.name
+                );
+                
+                html += `
+                    <div class="result-card">
+                        <div class="result-header">
+                            <div class="result-name">${highlightedName}</div>
+                            <button class="btn btn-danger" onclick="deleteRecord(${person.id})">🗑️ Elimina</button>
+                        </div>
+                        <div class="result-details">
+                            <div class="detail-item">
+                                <div class="detail-label">Nazionalità:</div>
+                                ${person.nazionalita}
+                            </div>
+                            <div class="detail-item">
+                                <div class="detail-label">Status:</div>
+                                ${formatStatus(person.status)}
+                            </div>
+                            <div class="detail-item">
+                                <div class="detail-label">Campo:</div>
+                                ${highlightSearchTerm(person.campo, searchTerms.camp)}
+                            </div>
+                            <div class="detail-item">
+                                <div class="detail-label">Località:</div>
+                                ${highlightSearchTerm(person.localitaCampo, searchTerms.location)}
+                            </div>
+                            <div class="detail-item">
+                                <div class="detail-label">Data Internamento:</div>
+                                ${formatDate(person.dataInternamento)}
+                            </div>
+                            <div class="detail-item">
+                                <div class="detail-label">Data Liberazione:</div>
+                                ${formatDate(person.dataLiberazione)}
+                            </div>
+                        </div>
+                        ${person.note ? `<div style="margin-top: 15px; padding: 10px; background: #f8f9fa; border-radius: 5px;"><strong>Note:</strong> ${person.note}</div>` : ''}
+                        ${person.documenti ? `<div style="margin-top: 10px; padding: 10px; background: #e7f3ff; border-radius: 5px;"><strong>Documenti:</strong> ${person.documenti}</div>` : ''}
+                        ${person.immagini && person.immagini.length > 0 ? `
+                            <div style="margin-top: 15px;">
+                                <strong style="color: #3e2723;">📷 Galleria Fotografica:</strong>
+                                <div class="image-gallery">
+                                    ${person.immagini.map((img, index) => `
+                                        <div class="gallery-image" onclick="openImageModal('${img.data}', '${img.nome}', '${person.nome} ${person.cognome}')">
+                                            <img src="${img.data}" alt="${img.nome}">
+                                            <div class="image-caption">${img.nome}</div>
+                                        </div>
+                                    `).join('')}
+                                </div>
+                            </div>
+                        ` : ''}
+                        <div style="margin-top: 15px; text-align: right;">
+                            <button class="btn btn-secondary" onclick="editRecord(${person.id})">✏️ Modifica</button>
+                        </div>
+                    </div>
+                `;
+            });
+            
+            resultsContainer.innerHTML = html;
+        }
+
+        function highlightSearchTerm(text, searchTerm) {
+            if (!searchTerm || !text) return text;
+            const regex = new RegExp(`(${searchTerm})`, 'gi');
+            return text.replace(regex, '<span class="highlight">$1</span>');
+        }
+
+        function formatStatus(status) {
+            const statusMap = {
+                'internato_militare': 'Internato Militare',
+                'internato_civile': 'Internato Civile',
+                'prigioniero_guerra': 'Prigioniero di Guerra',
+                'deportato': 'Deportato'
+            };
+            return statusMap[status] || status;
+        }
+
+        function formatDate(dateString) {
+            if (!dateString) return 'Non specificata';
+            const date = new Date(dateString);
+            return date.toLocaleDateString('it-IT');
+        }
+
+        function clearSearch() {
+            document.getElementById('searchName').value = '';
+            document.getElementById('searchCamp').value = '';
+            document.getElementById('searchLocation').value = '';
+            document.getElementById('searchYear').value = '';
+            document.getElementById('searchNationality').value = '';
+            document.getElementById('searchStatus').value = '';
+            document.getElementById('searchResults').innerHTML = '';
+        }
+
+        // Gestione form inserimento
+        document.getElementById('insertForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            const newRecord = {
+                id: editingId || Date.now(),
+                nome: document.getElementById('nome').value,
+                cognome: document.getElementById('cognome').value,
+                dataNascita: document.getElementById('dataNascita').value,
+                luogoNascita: document.getElementById('luogoNascita').value,
+                nazionalita: document.getElementById('nazionalita').value,
+                status: document.getElementById('status').value,
+                campo: document.getElementById('campo').value,
+                localitaCampo: document.getElementById('localitaCampo').value,
+                dataInternamento: document.getElementById('dataInternamento').value,
+                dataLiberazione: document.getElementById('dataLiberazione').value,
+                numeroMatricola: document.getElementById('numeroMatricola').value,
+                unitaMilitare: document.getElementById('unitaMilitare').value,
+                note: document.getElementById('note').value,
+                documenti: document.getElementById('documenti').value,
+                immagini: currentImages || []
+            };
+
+            if (editingId) {
+                // Modifica record esistente
+                const index = internatiDB.findIndex(p => p.id === editingId);
+                if (index !== -1) {
+                    internatiDB[index] = newRecord;
+                    alert('Record aggiornato con successo!');
+                }
+            } else {
+                // Nuovo record
+                internatiDB.push(newRecord);
+                alert('Nuovo internato aggiunto con successo!');
+            }
+
+            saveToStorage();
+            clearForm();
+            updateStatistics();
+        });
+
+        function clearForm() {
+            document.getElementById('insertForm').reset();
+            document.getElementById('nome').value = '';
+            document.getElementById('cognome').value = '';
+            document.getElementById('dataNascita').value = '';
+            document.getElementById('luogoNascita').value = '';
+            document.getElementById('nazionalita').value = '';
+            document.getElementById('status').value = '';
+            document.getElementById('campo').value = '';
+            document.getElementById('localitaCampo').value = '';
+            document.getElementById('dataInternamento').value = '';
+            document.getElementById('dataLiberazione').value = '';
+            document.getElementById('numeroMatricola').value = '';
+            document.getElementById('unitaMilitare').value = '';
+            document.getElementById('note').value = '';
+            document.getElementById('documenti').value = '';
+            document.getElementById('imagePreviewContainer').innerHTML = '';
+            currentImages = [];
+            editingId = null;
+        }
+
+        // Gestione upload immagini
+        function handleImageUpload(event) {
+            const files = event.target.files;
+            if (!files.length) return;
+
+            Array.from(files).forEach(file => {
+                if (file.type.startsWith('image/')) {
+                    const reader = new FileReader();
+                    reader.onload = function(e) {
+                        const imageData = {
+                            data: e.target.result,
+                            nome: file.name,
+                            tipo: file.type,
+                            dimensione: file.size,
+                            dataCaricamento: new Date().toISOString()
+                        };
+                        
+                        currentImages.push(imageData);
+                        updateImagePreview();
+                    };
+                    reader.readAsDataURL(file);
+                }
+            });
+        }
+
+        function updateImagePreview() {
+            const container = document.getElementById('imagePreviewContainer');
+            
+            if (currentImages.length === 0) {
+                container.innerHTML = '<div style="grid-column: 1/-1; text-align: center; color: #8d6e63; padding: 20px; font-style: italic;">Nessuna immagine caricata</div>';
+                return;
+            }
+
+            container.innerHTML = currentImages.map((img, index) => `
+                <div class="image-preview">
+                    <div class="image-actions">
+                        <button class="btn-small" onclick="viewImage(${index})" title="Visualizza">👁</button>
+                        <button class="btn-small" onclick="removeImage(${index})" title="Rimuovi">✕</button>
+                    </div>
+                    <img src="${img.data}" alt="${img.nome}">
+                    <div class="image-info">
+                        <div style="font-weight: bold;">${img.nome}</div>
+                        <div>${formatFileSize(img.dimensione)}</div>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        function removeImage(index) {
+            currentImages.splice(index, 1);
+            updateImagePreview();
+        }
+
+        function viewImage(index) {
+            const img = currentImages[index];
+            openImageModal(img.data, img.nome, 'Anteprima');
+        }
+
+        function formatFileSize(bytes) {
+            if (bytes === 0) return '0 Bytes';
+            const k = 1024;
+            const sizes = ['Bytes', 'KB', 'MB', 'GB'];
+            const i = Math.floor(Math.log(bytes) / Math.log(k));
+            return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
+        }
+
+        // Modal per visualizzazione immagini
+        function openImageModal(imageSrc, imageName, personName) {
+            const modal = document.getElementById('imageModal');
+            const modalImage = document.getElementById('modalImage');
+            const modalInfo = document.getElementById('modalImageInfo');
+            
+            modalImage.src = imageSrc;
+            modalImage.alt = imageName;
+            modalInfo.innerHTML = `
+                <strong>Documento:</strong> ${imageName}<br>
+                <strong>Relativo a:</strong> ${personName}
+            `;
+            
+            modal.classList.add('active');
+            document.body.style.overflow = 'hidden';
+        }
+
+        function closeImageModal() {
+            const modal = document.getElementById('imageModal');
+            modal.classList.remove('active');
+            document.body.style.overflow = 'auto';
+        }
+
+        // Chiudi modal cliccando fuori dall'immagine
+        document.getElementById('imageModal').addEventListener('click', function(e) {
+            if (e.target === this) {
+                closeImageModal();
+            }
+        });
+
+        // Modifica record esistente
+        function editRecord(id) {
+            const person = internatiDB.find(p => p.id === id);
+            if (!person) return;
+
+            editingId = id;
+            currentImages = [...(person.immagini || [])];
+
+            // Popola il form
+            document.getElementById('nome').value = person.nome;
+            document.getElementById('cognome').value = person.cognome;
+            document.getElementById('dataNascita').value = person.dataNascita;
+            document.getElementById('luogoNascita').value = person.luogoNascita;
+            document.getElementById('nazionalita').value = person.nazionalita;
+            document.getElementById('status').value = person.status;
+            document.getElementById('campo').value = person.campo;
+            document.getElementById('localitaCampo').value = person.localitaCampo;
+            document.getElementById('dataInternamento').value = person.dataInternamento;
+            document.getElementById('dataLiberazione').value = person.dataLiberazione;
+            document.getElementById('numeroMatricola').value = person.numeroMatricola;
+            document.getElementById('unitaMilitare').value = person.unitaMilitare;
+            document.getElementById('note').value = person.note;
+            document.getElementById('documenti').value = person.documenti;
+
+            updateImagePreview();
+            switchTab('inserimento');
+        }
+
+        function deleteRecord(id) {
+            if (confirm('Sei sicuro di voler eliminare questo record? Questa azione non può essere annullata.')) {
+                internatiDB = internatiDB.filter(person => person.id !== id);
+                saveToStorage();
+                performSearch(); // Aggiorna i risultati
+                updateStatistics();
+                alert('Record eliminato con successo.');
+            }
+        }
+
+        // Statistiche
+        function updateStatistics() {
+            const container = document.getElementById('statsContainer');
+            const stats = [
+                {
+                    number: internatiDB.length,
+                    label: 'Internati Totali'
+                }
+            ];
+
+            // Statistiche per nazionalità
+            const nationalityStats = {};
+            internatiDB.forEach(person => {
+                nationalityStats[person.nazionalita] = (nationalityStats[person.nazionalita] || 0) + 1;
+            });
+
+            // Statistiche per status
+            const statusStats = {};
+            internatiDB.forEach(person => {
+                statusStats[person.status] = (statusStats[person.status] || 0) + 1;
+            });
+
+            // Campi più frequenti
+            const campStats = {};
+            internatiDB.forEach(person => {
+                if (person.campo) {
+                    campStats[person.campo] = (campStats[person.campo] || 0) + 1;
+                }
+            });
+
+            // Aggiunge statistiche principali
+            stats.push({
+                number: Object.keys(nationalityStats).length,
+                label: 'Nazionalità Diverse'
+            });
+
+            stats.push({
+                number: Object.keys(campStats).length,
+                label: 'Campi Documentati'
+            });
+
+            // Aggiorna le statistiche delle immagini
+            const totalImages = internatiDB.reduce((sum, person) => sum + (person.immagini?.length || 0), 0);
+            const personsWithImages = internatiDB.filter(person => person.immagini?.length > 0).length;
+            
+            stats.push({
+                number: totalImages,
+                label: 'Documenti Fotografici'
+            });
+            
+            stats.push({
+                number: personsWithImages,
+                label: 'Schede con Immagini'
+            });
+
+            // Visualizza le statistiche
+            container.innerHTML = stats.map(stat => `
+                <div class="stat-card">
+                    <div class="stat-number">${stat.number}</div>
+                    <div class="stat-label">${stat.label}</div>
+                </div>
+            `).join('');
+
+            // Aggiungi dettagli per nazionalità
+            if (Object.keys(nationalityStats).length > 0) {
+                const nationalityDetails = Object.entries(nationalityStats)
+                    .sort(([,a], [,b]) => b - a)
+                    .slice(0, 5)
+                    .map(([nat, count]) => `${nat}: ${count}`)
+                    .join(', ');
+                
+                container.innerHTML += `
+                    <div class="stat-card" style="grid-column: 1/-1;">
+                        <div style="text-align: left;">
+                            <h4 style="margin-bottom: 10px; color: #5d4037;">Principali Nazionalità</h4>
+                            <p style="font-size: 1.1em; color: #3e2723;">${nationalityDetails}</p>
+                        </div>
+                    </div>
+                `;
+            }
+        }
+
+        // Export/Import functions
+        function exportData() {
+            const dataStr = JSON.stringify(internatiDB, null, 2);
+            const dataBlob = new Blob([dataStr], {type: 'application/json'});
+            const url = URL.createObjectURL(dataBlob);
+            const link = document.createElement('a');
+            link.href = url;
+            link.download = `archivio_internati_${new Date().toISOString().split('T')[0]}.json`;
+            link.click();
+            URL.revokeObjectURL(url);
+        }
+
+        function exportCSV() {
+            const headers = ['Nome', 'Cognome', 'Data Nascita', 'Luogo Nascita', 'Nazionalità', 'Status', 'Campo', 'Località Campo', 'Data Internamento', 'Data Liberazione', 'Numero Matricola', 'Unità Militare', 'Note', 'Documenti'];
+            
+            const csvContent = [
+                headers.join(','),
+                ...internatiDB.map(person => [
+                    `"${person.nome}"`,
+                    `"${person.cognome}"`,
+                    `"${person.dataNascita}"`,
+                    `"${person.luogoNascita}"`,
+                    `"${person.nazionalita}"`,
+                    `"${person.status}"`,
+                    `"${person.campo}"`,
+                    `"${person.localitaCampo}"`,
+                    `"${person.dataInternamento}"`,
+                    `"${person.dataLiberazione}"`,
+                    `"${person.numeroMatricola}"`,
+                    `"${person.unitaMilitare}"`,
+                    `"${person.note?.replace(/"/g, '""') || ''}"`,
+                    `"${person.documenti?.replace(/"/g, '""') || ''}"`
+                ].join(','))
+            ].join('\n');
+            
+            const dataBlob = new Blob([csvContent], {type: 'text/csv;charset=utf-8;'});
+            const url = URL.createObjectURL(dataBlob);
+            const link = document.createElement('a');
+            link.href = url;
+            link.download = `archivio_internati_${new Date().toISOString().split('T')[0]}.csv`;
+            link.click();
+            URL.revokeObjectURL(url);
+        }
+
+        function importData() {
+            const file = document.getElementById('importFile').files[0];
+            if (!file) return;
+
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                try {
+                    const data = JSON.parse(e.target.result);
+                    if (Array.isArray(data) && data.length > 0) {
+                        if (confirm(`Importare ${data.length} record? Questo sostituirà tutti i dati esistenti.`)) {
+                            internatiDB = data;
+                            saveToStorage();
+                            updateStatistics();
+                            alert('Dati importati con successo!');
+                        }
+                    } else {
+                        alert('File non valido o vuoto.');
+                    }
+                } catch (error) {
+                    alert('Errore nel parsing del file JSON.');
+                }
+            };
+            reader.readAsText(file);
+        }
+
+        function loadManagementList() {
+            const container = document.getElementById('managementList');
+            
+            if (internatiDB.length === 0) {
+                container.innerHTML = '<p style="text-align: center; color: #8d6e63; font-style: italic;">Nessun record presente nel database.</p>';
+                return;
+            }
+
+            let html = `
+                <div style="margin-bottom: 20px; padding: 15px; background: rgba(139, 69, 19, 0.1); border-left: 4px solid #8b4513;">
+                    <strong>Gestione Record:</strong> ${internatiDB.length} internati nel database
+                </div>
+                <div style="display: grid; gap: 10px;">
+            `;
+
+            internatiDB.forEach(person => {
+                html += `
+                    <div style="display: flex; justify-content: space-between; align-items: center; padding: 15px; background: #f5f5f5; border: 1px solid #8d6e63;">
+                        <div>
+                            <strong>${person.nome} ${person.cognome}</strong> - ${person.nazionalita} - ${person.campo}
+                            ${person.immagini && person.immagini.length > 0 ? `<span style="color: #5d4037;"> (${person.immagini.length} 📷)</span>` : ''}
+                        </div>
+                        <div style="display: flex; gap: 10px;">
+                            <button class="btn btn-secondary" onclick="editRecord(${person.id})" style="padding: 8px 15px; font-size: 0.9em;">✏️ Modifica</button>
+                            <button class="btn btn-danger" onclick="deleteRecord(${person.id})" style="padding: 8px 15px; font-size: 0.9em;">🗑️ Elimina</button>
+                        </div>
+                    </div>
+                `;
+            });
+
+            html += '</div>';
+            container.innerHTML = html;
+        }
+
+        // Inizializzazione al caricamento della pagina
+        document.addEventListener('DOMContentLoaded', function() {
+            loadFromStorage();
+            initializeDatabase();
+            updateStatistics();
+            
+            // Aggiorna l'anteprima immagini vuota
+            updateImagePreview();
+        });
+
+        // Gestione tasti scorciatoia
+        document.addEventListener('keydown', function(e) {
+            if (e.key === 'Escape') {
+                closeImageModal();
+            }
+        });
+    </script>
+</body>
+</html>
+                                <label for="nome">Nome *</label>
+                                <input type="text" id="nome" required>
+                            </div>
+                            <div class="form-group">
+                                <label for="cognome">Cognome *</label>
+                                <input type="text" id="cognome" required>
+                            </div>
+                            <div class="form-group">
+                                <label for="dataNascita">Data di Nascita</label>
+                                <input type="date" id="dataNascita">
+                            </div>
+                            <div class="form-group">
+                                <label for="luogoNascita">Luogo di Nascita</label>
+                                <input type="text" id="luogoNascita">
+                            </div>
+                            <div class="form-group">
+                                <label for="nazionalita">Nazionalità *</label>
+                                <select id="nazionalita" required>
+                                    <option value="">Seleziona nazionalità</option>
+                                    <option value="italiana">Italiana</option>
+                                    <option value="tedesca">Tedesca</option>
+                                    <option value="austriaca">Austriaca</option>
+                                    <option value="francese">Francese</option>
+                                    <option value="polacca">Polacca</option>
+                                    <option value="jugoslava">Jugoslava</option>
+                                    <option value="greca">Greca</option>
+                                    <option value="altra">Altra</option>
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label for="status">Status di Internamento *</label>
+                                <select id="status" required>
+                                    <option value="">Seleziona status</option>
+                                    <option value="internato_militare">Internato Militare</option>
+                                    <option value="internato_civile">Internato Civile</option>
+                                    <option value="prigioniero_guerra">Prigioniero di Guerra</option>
+                                    <option value="deportato">Deportato</option>
+                                </select>
+                            </div>
+                            <div class="form-group">
